@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bug Reporter</title>
+  <style type="text/css">
+    *, :after, :before {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+      -o-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -moz-tap-highlight-color: transparent;
+      -ms-tap-highlight-color: transparent;
+      -o-tap-highlight-color: transparent;
+      tap-highlight-color: transparent;
+    }
+
+    body, html, #app {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: none;
+    }
+  </style>
+  <script src="../lib/bugReporter.js"></script>
+  <script type="text/javascript">
+    window.bugReporter.init({
+      appId: '',
+      appKey: '',
+      appClass: '',
+      debug: true,
+      output: false,
+      url: '/bug/reporter',
+      type: 'post',
+      success: function(text) {
+        console.log(text)
+      },
+      fail: function(req) {
+        console.error(req);
+      },
+      window: [],
+      navigator: ['language', 'platform', 'userAgent'],
+      screen: ['width', 'height']
+    });
+  </script>
+</head>
+<body>
+  <p>Open Developer Tool to see detail.</p>
+  <script type="text/javascript">
+    window.setTimeout(function() {
+      call_something_undefined();
+    }, 3 * 1000);
+
+    window.setTimeout(function() {
+      window.bugReporter.destory();
+    }, 6 * 1000);
+  </script>
+</body>
+</html>
