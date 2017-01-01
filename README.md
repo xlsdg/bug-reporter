@@ -11,7 +11,7 @@ $ npm install --save bug-reporter
 
 ## Usage
 
-使用 LeanCloud 或 自备后台服务器接口 保存 Bug 信息。
+使用 LeanCloud 或 自备后台服务器接口 (二选一)保存 Bug 信息。
 
 ``` html
   <!DOCTYPE html>
@@ -41,8 +41,16 @@ $ npm install --save bug-reporter
 ## Options
 
 * `appId` **[String]**
+
+  LeanCloud App ID
+
 * `appKey` **[String]**
+
+  LeanCloud App Key
+
 * `appClass` **[String]**
+
+  LeanCloud Data Class
 
 * `debug` **[Boolean]**
 
