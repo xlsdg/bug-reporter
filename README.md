@@ -77,17 +77,20 @@ $ npm install --save bug-reporter
 
 * `init`
 
+``` js
   @param    {Object} opts bugReporter options
+```
 
 * `destory`
 * `report`
 
+``` js
   @param    {String} method 'GET' or 'POST' or 'JSON'
   @param    {String} url
   @param    {Object} data
   @param    {Function} cbSucs success callback
   @param    {Function} cbFail fail callback
-
+```
 
 # License
 
