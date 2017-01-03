@@ -168,6 +168,7 @@ const bugReporter = window.bugReporter || {};
   bugReporter.injectSDK = function(cb) {
     const av = document.createElement('script');
     av.setAttribute('type', 'text/javascript');
+    av.setAttribute('async', 'async');
     av.src = bugReporter.sdk.url;
     if (av.readyState) {
       av.onreadystatechange = function() {
