@@ -6,10 +6,51 @@ const bugReporter = window.bugReporter || {};
     return;
   }
 
-  const getTimeStamp = function() {
+  bugReporter.getTimeStamp = function() {
     return (new Date()).getTime();
   };
-  bugReporter.getTimeStamp = getTimeStamp;
+
+  bugReporter.log = function(content) {
+    if (bugReporter.debug) {
+      console.log(content);
+    }
+  };
+
+  bugReporter.procCatch = function(err) {
+    const data = {
+      time: bugReporter.getTimeStamp(),
+      msg: err.message,
+      url: window.location.href,
+      line: err.lineNumber,
+      col: err.columnNumber,
+      err: {
+        name: err.name,
+        number: err.number,
+        description: err.description,
+        file: err.fileName
+      },
+      stack: err.stack
+    };
+    procData(data);
+  };
+
+  bugReporter.wrap = function(fn) {
+    if (!fn.__wrapped__) {
+      fn.__wrapped__ = function() {
+        try {
+          return fn.apply(this, arguments);
+        } catch (err) {
+          bugReporter.procCatch(err);
+          throw err;
+        }
+      };
+    }
+    return fn.__wrapped__;
+  };
+
+  bugReporter.invoke = bugReporter.wrap(function(obj, method, args) {
+    return obj[method].apply(this, args);
+  });
 
   const createXMLHTTPObject = function() {
     let xmlhttp = false;
@@ -54,9 +95,8 @@ const bugReporter = window.bugReporter || {};
     }
     return str.join('&');
   };
-  bugReporter.formatParams = formatParams;
 
-  const report = function(method, url, data, cbSucs, cbFail) {
+  bugReporter.report = function(method, url, data, cbSucs, cbFail) {
     const req = createXMLHTTPObject();
     if (!req) {
       return cbFail && cbFail(req);
@@ -64,7 +104,7 @@ const bugReporter = window.bugReporter || {};
 
     method = method.toUpperCase();
     if (method === 'GET') {
-      url = `${url}?${formatParams(data)}&_t=${getTimeStamp()}`;
+      url = `${url}?${formatParams(data)}&_t=${bugReporter.getTimeStamp()}`;
       data = null;
     }
 
@@ -73,6 +113,10 @@ const bugReporter = window.bugReporter || {};
       req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     } else if (method === 'JSON') {
       req.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+    }
+
+    if (data) {
+      data = JSON.stringify(data);
     }
 
     req.onreadystatechange = function() {
@@ -87,45 +131,54 @@ const bugReporter = window.bugReporter || {};
 
     req.send(data);
   };
-  bugReporter.report = report;
 
   const procData = function(data) {
     if (bugReporter.window.length) {
       data.window = {};
     }
     for(let i = 0, wLen = bugReporter.window.length; i < wLen; i++) {
-      data.window[bugReporter.window[i]] = window[bugReporter.window[i]];
+      data.window[
+        bugReporter.window[i]
+      ] = window[
+        bugReporter.window[i]
+      ];
     }
 
     if (bugReporter.navigator.length) {
       data.navigator = {};
     }
     for(let j = 0, nLen = bugReporter.navigator.length; j < nLen; j++) {
-      data.navigator[bugReporter.navigator[j]] = window.navigator[bugReporter.navigator[j]];
+      data.navigator[
+        bugReporter.navigator[j]
+      ] = window.navigator[
+        bugReporter.navigator[j]
+      ];
     }
 
     if (bugReporter.screen.length) {
       data.screen = {};
     }
     for(let k = 0, sLen = bugReporter.screen.length; k < sLen; k++) {
-      data.screen[bugReporter.screen[k]] = window.screen[bugReporter.screen[k]];
+      data.screen[
+        bugReporter.screen[k]
+      ] = window.screen[
+        bugReporter.screen[k]
+      ];
     }
-
-    const bug = JSON.stringify(data);
 
     if (bugReporter.sdk.ins) {
       bugReporter.sdk.save(data);
     }
 
     if (bugReporter.url) {
-      report(bugReporter.type, bugReporter.url,
-        bug,
+      bugReporter.report(bugReporter.type, bugReporter.url,
+        data,
         bugReporter.success,
         bugReporter.fail
       );
     }
 
-    bugReporter.debug && console.log(bug);
+    bugReporter.log(data);
   };
 
   const procError = function(msg, url, line, col, err) {
@@ -154,7 +207,7 @@ const bugReporter = window.bugReporter || {};
       }
 
       procData({
-        time: getTimeStamp(),
+        time: bugReporter.getTimeStamp(),
         msg, url, line,
         col: col || (window.event && window.event.errorCharacter) || 0,
         err, stack
@@ -214,9 +267,9 @@ const bugReporter = window.bugReporter || {};
       const lc = new bugReporter.sdk.ins();
       lc.save(data)
         .then(function(obj) {
-          bugReporter.debug && console.log(obj);
+          bugReporter.log(obj);
         }).catch(function(err) {
-          bugReporter.debug && console.error(err);
+          bugReporter.log(err);
         }
       );
     }
@@ -240,7 +293,9 @@ const bugReporter = window.bugReporter || {};
     bugReporter.fail = opts.fail || function(req) {};
 
     bugReporter.window = opts.window || [];
-    bugReporter.navigator = opts.navigator || ['language', 'platform', 'userAgent'];
+    bugReporter.navigator = opts.navigator || [
+      'language', 'platform', 'userAgent'
+    ];
     bugReporter.screen = opts.screen || ['width', 'height'];
 
     window.onerror = procError;
@@ -260,8 +315,6 @@ const bugReporter = window.bugReporter || {};
       bugReporter.uninjectSDK();
     }
   };
-
-  window.bugReporter = bugReporter;
 })();
 
 export default bugReporter;

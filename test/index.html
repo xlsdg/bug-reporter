@@ -54,6 +54,10 @@
       call_something_undefined();
     }, 3 * 1000);
 
+    window.setTimeout(window.bugReporter.wrap(function() {
+      do_synchronous_stuff();
+    }), 4 * 1000);
+
     window.setTimeout(function() {
       window.bugReporter.destory();
     }, 6 * 1000);

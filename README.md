@@ -93,11 +93,25 @@ $ npm install --save bug-reporter
 * `report`
 
 ``` js
-  @param    {String} method 'GET' or 'POST' or 'JSON'
+  @param    {String} method - 'GET' or 'POST' or 'JSON'
   @param    {String} url
   @param    {Object} data
-  @param    {Function} cbSucs success callback
-  @param    {Function} cbFail fail callback
+  @param    {Function} cbSucs - success callback
+  @param    {Function} cbFail - fail callback
+```
+
+* `wrap` **[A generic wrapper utility function]**
+
+``` js
+  @param    {Function} fn
+```
+
+* `invoke` **[which calls a function on an object with an array of arguments]**
+
+``` js
+  @param    {Object} obj
+  @param    {Function} method
+  @param    {Array} args
 ```
 
 # License
