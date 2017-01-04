@@ -86,7 +86,7 @@ $ npm install --save bug-reporter
 * `init`
 
 ``` js
-  @param    {Object} opts bugReporter options
+  @param    {Object} opts - bugReporter options
 ```
 
 * `destory`
