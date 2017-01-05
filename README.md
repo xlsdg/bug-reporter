@@ -37,6 +37,11 @@ $ npm install --save bug-reporter
   </html>
 ```
 
+or
+
+``` js
+<script src="//unpkg.com/bug-reporter/lib/bugReporter.min.js"></script>
+```
 
 ## Options
 
