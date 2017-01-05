@@ -2,7 +2,7 @@
   "name": "bug-reporter",
   "version": "0.1.3",
   "description": "A simple javascript bug reporter",
-  "main": "lib/bugReporter.js",
+  "main": "lib/bugReporter.min.js",
   "files": [
     "lib",
     "src"
