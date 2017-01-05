@@ -1,5 +1,6 @@
 # bug-reporter
-A simple javascript bug reporter
+
+> A pure JavaScript library handle report error message
 
 
 ## Installation

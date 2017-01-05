@@ -1,7 +1,7 @@
 {
   "name": "bug-reporter",
   "version": "0.1.4",
-  "description": "A simple javascript bug reporter",
+  "description": "A pure JavaScript library handle report error message",
   "main": "lib/bugReporter.min.js",
   "files": [
     "lib",
