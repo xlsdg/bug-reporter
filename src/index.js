@@ -221,11 +221,11 @@ const bugReporter = window.bugReporter || {};
   bugReporter.injectSDK = function(cb) {
     const av = document.createElement('script');
     av.setAttribute('type', 'text/javascript');
-    av.setAttribute('async', 'async');
-    av.src = bugReporter.sdk.url;
+    av.async = true;
+    av.charset = 'UTF-8';
     if (av.readyState) {
       av.onreadystatechange = function() {
-        if (this.readyState === 'complete') {
+        if (av.readyState === 'loaded' || av.readyState === 'complete') {
           av.onreadystatechange = null;
           cb && cb();
         }
@@ -236,6 +236,7 @@ const bugReporter = window.bugReporter || {};
         cb && cb();
       };
     }
+    av.src = `${bugReporter.sdk.url}?_t=${(new Date()).getTime()}`;
     const s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(av, s);
 
