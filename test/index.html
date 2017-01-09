@@ -58,6 +58,10 @@
       do_synchronous_stuff();
     }), 4 * 1000);
 
+    // window.setTimeout(function() {
+    //   console.error('catch error!');
+    // }, 5 * 1000);
+
     window.setTimeout(function() {
       window.bugReporter.destory();
     }, 6 * 1000);

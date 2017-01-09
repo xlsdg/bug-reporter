@@ -106,6 +106,12 @@ or
   @param    {Function} cbFail - fail callback
 ```
 
+* `sendData`
+
+``` js
+  @param    {Object} data
+```
+
 * `wrap` **[A generic wrapper utility function]**
 
 ``` js

@@ -18,7 +18,6 @@ const bugReporter = window.bugReporter || {};
 
   bugReporter.procCatch = function(err) {
     const data = {
-      time: bugReporter.getTimeStamp(),
       msg: err.message,
       url: window.location.href,
       line: err.lineNumber,
@@ -31,7 +30,7 @@ const bugReporter = window.bugReporter || {};
       },
       stack: err.stack
     };
-    procData(data);
+    bugReporter.sendData(data);
   };
 
   bugReporter.wrap = function(fn) {
@@ -132,39 +131,63 @@ const bugReporter = window.bugReporter || {};
     req.send(data);
   };
 
-  const procData = function(data) {
-    if (bugReporter.window.length) {
-      data.window = {};
+  const copyProps = function(data, name) {
+    const len = bugReporter[name].length;
+    if (!len || len < 1) {
+      return;
     }
-    for(let i = 0, wLen = bugReporter.window.length; i < wLen; i++) {
-      data.window[
-        bugReporter.window[i]
-      ] = window[
-        bugReporter.window[i]
+    const dst = data[name] = {};
+    for (let i = 0; i < len; i++) {
+      dst[
+        bugReporter[name][i]
+      ] = (name === 'window') ? window[
+        bugReporter[name][i]
+      ] : window[name][
+        bugReporter[name][i]
       ];
+    }
+  };
+
+  bugReporter.sendData = function(data) {
+    if (!data.time) {
+      data['time'] = bugReporter.getTimeStamp();
     }
 
-    if (bugReporter.navigator.length) {
-      data.navigator = {};
-    }
-    for(let j = 0, nLen = bugReporter.navigator.length; j < nLen; j++) {
-      data.navigator[
-        bugReporter.navigator[j]
-      ] = window.navigator[
-        bugReporter.navigator[j]
-      ];
-    }
+    copyProps(data, 'window');
+    // if (bugReporter.window.length) {
+    //   data.window = {};
+    // }
+    // for(let i = 0, wLen = bugReporter.window.length; i < wLen; i++) {
+    //   data.window[
+    //     bugReporter.window[i]
+    //   ] = window[
+    //     bugReporter.window[i]
+    //   ];
+    // }
 
-    if (bugReporter.screen.length) {
-      data.screen = {};
-    }
-    for(let k = 0, sLen = bugReporter.screen.length; k < sLen; k++) {
-      data.screen[
-        bugReporter.screen[k]
-      ] = window.screen[
-        bugReporter.screen[k]
-      ];
-    }
+    copyProps(data, 'navigator');
+    // if (bugReporter.navigator.length) {
+    //   data.navigator = {};
+    // }
+    // for(let j = 0, nLen = bugReporter.navigator.length; j < nLen; j++) {
+    //   data.navigator[
+    //     bugReporter.navigator[j]
+    //   ] = window.navigator[
+    //     bugReporter.navigator[j]
+    //   ];
+    // }
+
+    copyProps(data, 'screen');
+    // if (bugReporter.screen.length) {
+    //   data.screen = {};
+    // }
+    // for(let k = 0, sLen = bugReporter.screen.length; k < sLen; k++) {
+    //   data.screen[
+    //     bugReporter.screen[k]
+    //   ] = window.screen[
+    //     bugReporter.screen[k]
+    //   ];
+    // }
 
     if (bugReporter.sdk.ins) {
       bugReporter.sdk.save(data);
@@ -206,8 +229,7 @@ const bugReporter = window.bugReporter || {};
         stack = ext.join(',');
       }
 
-      procData({
-        time: bugReporter.getTimeStamp(),
+      bugReporter.sendData({
         msg, url, line,
         col: col || (window.event && window.event.errorCharacter) || 0,
         err, stack
@@ -222,20 +244,21 @@ const bugReporter = window.bugReporter || {};
     const av = document.createElement('script');
     av.setAttribute('type', 'text/javascript');
     av.async = true;
-    av.charset = 'UTF-8';
+    av.charset = 'utf-8';
     if (av.readyState) {
       av.onreadystatechange = function() {
         if (av.readyState === 'loaded' || av.readyState === 'complete') {
           av.onreadystatechange = null;
-          cb && cb();
+          cb && cb(av);
         }
       };
     } else {
       av.onload = function() {
         av.onload = null;
-        cb && cb();
+        cb && cb(av);
       };
     }
+    av.onerror = function() {};
     av.src = `${bugReporter.sdk.url}?_t=${(new Date()).getTime()}`;
     const s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(av, s);
@@ -246,7 +269,7 @@ const bugReporter = window.bugReporter || {};
   };
 
   bugReporter.initSDK = function(appId, appKey, appClass) {
-    bugReporter.injectSDK(function() {
+    bugReporter.injectSDK(function(dom) {
       setTimeout(function() {
         bugReporter.sdk.ins = bugReporter.sdk.init(appId, appKey, appClass);
       }, 0);
