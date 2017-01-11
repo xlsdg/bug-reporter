@@ -1,0 +1,20 @@
+{
+  "entry": "src/index.js",
+  "publicPath": "/bug-reporter/",
+  "disableCSSModules": false,
+  "autoprefixer": null,
+  "proxy": null,
+  "env": {
+    "development": {
+      "extraBabelPlugins": [
+        "dva-hmr",
+        "transform-runtime"
+      ]
+    },
+    "production": {
+      "extraBabelPlugins": [
+        "transform-runtime"
+      ]
+    }
+  }
+}
